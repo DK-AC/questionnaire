@@ -18,6 +18,13 @@ const surveySlice = createSlice({
     changeCurrentStep: state => {
       state.currentStep++
     },
+    resetState: state => {
+      state.answers = []
+      state.currentStep = 0
+      state.selectedAnswer = null
+      state.isAnswerCorrect = false
+      state.isShowSnackbar = false
+    },
     setAnswers: (state, action: PayloadAction<{ answer: string }>) => {
       state.answers.push(action.payload.answer)
     },
@@ -36,6 +43,7 @@ const surveySlice = createSlice({
 
 export const {
   changeCurrentStep,
+  resetState,
   setAnswers,
   setIsAnswerCorrect,
   setIsShowSnackbar,

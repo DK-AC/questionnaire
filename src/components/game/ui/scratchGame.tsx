@@ -1,61 +1,144 @@
-import * as Phaser from 'phaser'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-import nightImage from './../../../../public/night.png'
-import sunsetImage from './../../../../public/sunset.png'
+import { CustomizedSnackbars } from '@/components/errorSnackbar/errorSnackbar'
+import { RoutePath } from '@/config/routeConfig'
+import { useAppDispatch } from '@/store/hooks/hooks'
+import { resetState } from '@/store/slice/surveySlice'
+import * as PIXI from 'pixi.js'
+
+import png from './../../../../public/night.png'
+import sunset from './../../../../public/sunset.png'
 
 const ScratchGame = () => {
-  const config: Phaser.Types.Core.GameConfig = {
-    height: 600,
-    parent: 'root',
-    scene: {
-      create: create,
-      preload: preload,
-      update: update,
-    },
-    type: Phaser.AUTO,
-    width: 800,
-  }
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
-  new Phaser.Game(config)
+  const [open, setOpen] = useState(false)
+  const [success, setSuccess] = useState(false)
 
-  let nightLayer: Phaser.GameObjects.Image
-  let maskGraphics: Phaser.GameObjects.Graphics
-  let isScratching = false
+  useEffect(() => {
+    const game = new PIXI.Application({ height: 600, width: 800 })
 
-  function preload(this: Phaser.Scene): void {
-    this.load.image('sunset', sunsetImage)
-    this.load.image('night', nightImage)
-  }
+    document.body.appendChild(game.view as any)
 
-  function create(this: Phaser.Scene): void {
-    this.add.image(400, 300, 'sunset')
+    const stageSize = { height: game.screen.height, width: game.screen.width }
+    const renderTexture = PIXI.RenderTexture.create(stageSize)
 
-    nightLayer = this.add.image(400, 300, 'night')
+    const brush = new PIXI.Graphics().beginFill(0xffffff).drawCircle(0, 0, 50)
 
-    maskGraphics = this.add.graphics()
+    const line = new PIXI.Graphics()
 
-    nightLayer.setDepth(1)
+    PIXI.Assets.add('t1', sunset)
+    PIXI.Assets.add('t2', png)
+    PIXI.Assets.load(['t1', 't2']).then(setup)
 
-    this.input.on('pointerdown', startScratch)
-    this.input.on('pointerup', stopScratch)
-  }
+    function setup() {
+      const background = Object.assign(PIXI.Sprite.from('t1'), stageSize)
+      const imageToReveal = Object.assign(PIXI.Sprite.from('t2'), stageSize)
+      const renderTextureSprite = new PIXI.Sprite(renderTexture)
 
-  function update(this: Phaser.Scene): void {
-    if (isScratching) {
-      maskGraphics.fillCircle(this.input.x, this.input.y, 50)
+      imageToReveal.mask = renderTextureSprite
+
+      game.stage.addChild(background, imageToReveal, renderTextureSprite)
+
+      game.stage.interactive = true
+      game.stage.hitArea = game.screen
+      game.stage
+        .on('pointerdown', pointerDown)
+        .on('pointerup', pointerUp)
+        .on('pointerupoutside', pointerUp)
+        .on('pointermove', pointerMove)
+
+      let dragging = false
+      let lastDrawnPoint: PIXI.Point | null = null
+
+      function pointerMove(event: any) {
+        if (dragging) {
+          const { x, y } = event.data.global
+
+          brush.position.set(x, y)
+          game.renderer.render(brush, {
+            clear: false,
+            renderTexture,
+            skipUpdateTransform: false,
+          })
+
+          if (lastDrawnPoint) {
+            line
+              .clear()
+              .lineStyle({ color: 0xffffff, width: 100 })
+              .moveTo(lastDrawnPoint.x, lastDrawnPoint.y)
+              .lineTo(x, y)
+            game.renderer.render(line, {
+              clear: false,
+              renderTexture,
+              skipUpdateTransform: false,
+            })
+          }
+
+          lastDrawnPoint = lastDrawnPoint || new PIXI.Point()
+          lastDrawnPoint.set(x, y)
+
+          updatePaintedPixels()
+        }
+      }
+
+      function pointerDown(event: any) {
+        dragging = true
+        pointerMove(event)
+      }
+
+      function pointerUp() {
+        dragging = false
+        lastDrawnPoint = null
+      }
+
+      updatePaintedPixels()
     }
-    nightLayer.setMask(maskGraphics.createGeometryMask())
+
+    function updatePaintedPixels() {
+      const pixels = game.renderer.plugins.extract.pixels(renderTexture)
+      let paintedPixels = 0
+
+      for (let i = 0; i < pixels.length; i += 4) {
+        const alpha = pixels[i + 3]
+
+        if (alpha > 0) {
+          paintedPixels++
+        }
+      }
+
+      const progress = (paintedPixels / (stageSize.width * stageSize.height)) * 100
+
+      if (progress >= 80) {
+        setSuccess(true)
+        setOpen(true)
+
+        // Show the success notification for 3 seconds
+        setTimeout(() => {
+          setOpen(false)
+          dispatch(resetState())
+          navigate(RoutePath.RESULT)
+        }, 1000)
+      }
+    }
+
+    return () => {
+      game.destroy(true)
+    }
+  }, [navigate])
+
+  const handleClose = () => {
+    setOpen(false)
   }
 
-  function startScratch(): void {
-    isScratching = true
-  }
-
-  function stopScratch(): void {
-    isScratching = false
-  }
-
-  return <div />
+  return (
+    <div>
+      <div id={'pixi-container'} />
+      <CustomizedSnackbars isAnswerCorrect={success} onClose={handleClose} open={open} />
+    </div>
+  )
 }
 
 export default ScratchGame

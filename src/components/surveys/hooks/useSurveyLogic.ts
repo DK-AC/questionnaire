@@ -5,6 +5,7 @@ import { RoutePath } from '@/config/routeConfig'
 import { useAppDispatch } from '@/store/hooks/hooks'
 import {
   changeCurrentStep,
+  resetState,
   selectAnswer,
   selectCurrentStep,
   selectIsAnswerCorrect,
@@ -44,6 +45,7 @@ export const useSurveyLogic = () => {
 
     if (currentStep + 1 === 4) {
       navigate(RoutePath.GAME)
+      dispatch(resetState())
     }
   }
 
