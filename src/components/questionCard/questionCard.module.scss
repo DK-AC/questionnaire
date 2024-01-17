@@ -1,0 +1,17 @@
+.card {
+  width: 100%;
+  max-width: 350px;
+  padding-bottom: 0;
+  background: linear-gradient(to right, #f3eeed, #afa49f);
+
+  .content {
+    margin-bottom: 10px;
+    padding-bottom: 0;
+  }
+
+  .title {
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+}
