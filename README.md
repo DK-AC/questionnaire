@@ -1,30 +1,11 @@
-# React + TypeScript + Vite
+Project Overview:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The project is a web application designed for conducting surveys. In the application, users answer a series of questions by selecting one of the provided answer options. Upon completing the survey, the results are displayed, including the correct answers. After finishing the survey, users are offered the opportunity to play an engaging scratch game. Utilizing the Pixi.js, the web application creates a visual component consisting of two layers. To achieve victory, users must erase 80% of the first layer.
 
-Currently, two official plugins are available:
+Technologies Used:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+React: for building the user interface and managing application state.
+Redux: for efficient state management.
+React Router: for navigation between pages.
+Pixi.js: for creating the visual component of the scratch game.
+MUI (Material-UI): for creating the structure and styling the interface.
