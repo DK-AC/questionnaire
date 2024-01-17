@@ -6,14 +6,33 @@
     text-align: center;
   }
 
+  .resultItem {
+    margin-bottom: 20px;
+  }
+
   .btnBox {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-around;
     margin-top: 20px;
   }
 
   .button {
-    width: 220px;
+    width: 100%;
+    max-width: 220px;
+    margin-bottom: 10px;
+  }
+
+  @media (width >= 600px) {
+    .btnBox {
+      flex-direction: row;
+      justify-content: space-around;
+    }
+
+    .button {
+      margin-bottom: 0;
+    }
+
+   
   }
 }
