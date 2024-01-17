@@ -5,7 +5,7 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 
 const initialState: SurveyState = {
   answers: [],
-  currentStep: 1,
+  currentStep: 0,
   isAnswerCorrect: false,
   isShowSnackbar: false,
   selectedAnswer: null,
